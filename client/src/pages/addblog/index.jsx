@@ -14,15 +14,24 @@ export default function AddNewBlog() {
   console.log(formData);
 
   async function handleSaveBlogToDatabase() {
-    const response = await axios.post("http://localhost:5000/api/blogs/add", {
-      title: formData.title,
-      description: formData.description,
-    });
+    const response = isEdit
+      ? await axios.put(
+          `http://localhost:5000/api/blogs/update/${location.state.getCurrentBlogItem._id}`,
+          {
+            title: formData.title,
+            description: formData.description,
+          }
+        )
+      : await axios.post("http://localhost:5000/api/blogs/add", {
+          title: formData.title,
+          description: formData.description,
+        });
 
     const result = await response.data;
     console.log(result);
 
     if (result) {
+      setIsEdit(false);
       setformData({ title: "", description: "" });
       navigate("/");
     }
