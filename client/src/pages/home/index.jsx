@@ -1,6 +1,8 @@
 import { useContext, useEffect } from "react";
 import { GlobalContext } from "../../context";
 import axios from "axios";
+import classes from "./styles.module.css";
+import { FaTrash, FaEdit } from "react-icons/fa";
 
 export default function Home() {
   const { blogList, setBlogList, pending, setPending } =
@@ -20,21 +22,32 @@ export default function Home() {
     }
   }
 
+  async function handleDeleteBlog(getCurrentId) {
+    console.log(getCurrentId);
+  }
+
   useEffect(() => {
     fetchListOfBlogs();
   }, []);
 
   return (
-    <div>
-      <h1>Blog List</h1>
+    <div className={classes.wrapper}>
+      <h1 className="font-bold text-2xl mb-4 text-amber-700">Blog List</h1>
       {pending ? (
-        <h1>Loading Blogs! Please wait</h1>
+        <h1>Loading...! Please wait</h1>
       ) : (
-        <div>
+        <div className={classes.blogList}>
           {blogList.map((item) => (
-            <div key={item._id}>
+            <div
+              className="border border-orange-700 p-4 rounded-md"
+              key={item._id}
+            >
               <p>{item.title}</p>
               <p>{item.description}</p>
+              <div className="flex mt-4 gap-4">
+                <FaEdit size={30} />
+                <FaTrash onClick={() => handleDeleteBlog(item._id)} size={30} />
+              </div>
             </div>
           ))}
         </div>
