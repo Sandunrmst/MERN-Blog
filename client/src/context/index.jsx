@@ -1,8 +1,28 @@
+import { createContext, useState } from "react";
 
-import {createContext} from "react"
+export const GlobalContext = createContext(null);
 
-export const GlobalContext = createContext(null)
+export default function GlobalState({ children }) {
+  const [formData, setformData] = useState({
+    title: "",
+    description: "",
+  });
 
-export default function GlobalState({children}){
-    return <GlobalContext.Provider>{children}</GlobalContext.Provider>
+  const [blogList, setBlogList] = useState([]);
+  const [pending, setPending] = useState(false);
+
+  return (
+    <GlobalContext.Provider
+      value={{
+        blogList,
+        setBlogList,
+        pending,
+        setPending,
+        formData,
+        setformData,
+      }}
+    >
+      {children}
+    </GlobalContext.Provider>
+  );
 }
