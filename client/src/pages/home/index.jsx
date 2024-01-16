@@ -3,10 +3,13 @@ import { GlobalContext } from "../../context";
 import axios from "axios";
 import classes from "./styles.module.css";
 import { FaTrash, FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const { blogList, setBlogList, pending, setPending } =
     useContext(GlobalContext);
+
+  const navigate = useNavigate();
 
   async function fetchListOfBlogs() {
     setPending(true);
@@ -19,11 +22,29 @@ export default function Home() {
     if (result && result.blogList && result.blogList.length) {
       setBlogList(result.blogList);
       setPending(false);
+    } else {
+      setPending(false);
+      setBlogList([]);
     }
   }
 
   async function handleDeleteBlog(getCurrentId) {
     console.log(getCurrentId);
+
+    const response = await axios.delete(
+      `http://localhost:5000/api/blogs/delete/${getCurrentId}`
+    );
+
+    const result = await response.data;
+    //Refresh blog list after delete the relavent post
+    if (result?.message) {
+      fetchListOfBlogs();
+    }
+  }
+
+  function handleEdit(getCurrentBlogItem) {
+    console.log(getCurrentBlogItem);
+    navigate("/add-blog", { state: { getCurrentBlogItem } });
   }
 
   useEffect(() => {
@@ -39,14 +60,22 @@ export default function Home() {
         <div className={classes.blogList}>
           {blogList.map((item) => (
             <div
-              className="border border-orange-700 p-4 rounded-md"
+              className="border-2 border-orange-700 p-4 rounded-xl"
               key={item._id}
             >
               <p>{item.title}</p>
               <p>{item.description}</p>
               <div className="flex mt-4 gap-4">
-                <FaEdit size={30} />
-                <FaTrash onClick={() => handleDeleteBlog(item._id)} size={30} />
+                <FaEdit
+                  onClick={() => handleEdit(item)}
+                  className="cursor-pointer text-gray-600"
+                  size={30}
+                />
+                <FaTrash
+                  className="cursor-pointer text-red-700"
+                  onClick={() => handleDeleteBlog(item._id)}
+                  size={30}
+                />
               </div>
             </div>
           ))}

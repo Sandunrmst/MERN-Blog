@@ -1,12 +1,15 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import classes from "./styles.module.css";
 import { GlobalContext } from "../../context";
 import axios from "axios";
-import { useNavigation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AddNewBlog() {
-  const { formData, setformData } = useContext(GlobalContext);
-  const navigate = useNavigation;
+  const { formData, setformData, isEdit, setIsEdit } =
+    useContext(GlobalContext);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   console.log(formData);
 
@@ -25,9 +28,23 @@ export default function AddNewBlog() {
     }
   }
 
+  useEffect(() => {
+    console.log(location);
+    if (location.state) {
+      const { getCurrentBlogItem } = location.state;
+      setIsEdit(true);
+      setformData({
+        title: getCurrentBlogItem.title,
+        description: getCurrentBlogItem.description,
+      });
+    }
+  }, []);
+
   return (
     <div className={classes.wrapper}>
-      <h1 className="mb-4 font-bold">Add a Blog</h1>
+      <h1 className="mb-4 font-bold">
+        {isEdit ? "Edit a Blog" : "Add a Blog"}
+      </h1>
       <div className={classes.formWrapper}>
         <input
           className="border rounded-md p-4"
@@ -61,7 +78,7 @@ export default function AddNewBlog() {
         onClick={handleSaveBlogToDatabase}
         className="mt-4 p-2 px-4 text-white bg-orange-600 hover:bg-orange-700 transition-all duration-150 rounded-md"
       >
-        Add New Blog
+        {isEdit ? "Edit a Blog" : "Add a Blog"}
       </button>
     </div>
   );
